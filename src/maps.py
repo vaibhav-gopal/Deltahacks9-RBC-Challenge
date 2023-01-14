@@ -1,20 +1,20 @@
-import requests
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+
 from pathlib import Path
 import pandas as pd
 import folium
 import os, subprocess
 
-url = 'https://www.kijiji.ca/b-apartments-condos/hamilton/c37l80014'
-page = requests.get(url)
-soup = BeautifulSoup(page.content, 'html.parser')
+#Web Scraping shit —————————————————————————
+driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+driver.get("https://www.selenium.dev/selenium/web/web-form.html")
 
-rentals = soup.find_all(class_='info-container')
-for rental in rentals:
-    title = rental.find(class_='title').get_text().strip()
-    price = rental.find(class_='price').get_text().strip()
-    print(title + ' | ' + price)
 
+
+
+#Map shit ——————————————————————————————
 source_path = Path(__file__).resolve().parent
 path = source_path/'location.csv'
 houses = pd.read_csv(path)
@@ -29,9 +29,4 @@ if __name__ == '__main__':
     # save map to html file
     map_kenya.save('index.html')
     html_path = source_path.parent/'index.html'
-    try:
-        # Using Windows
-        os.startfile(html_path)
-    except:
-        # Using Mac or Linux
-        subprocess.call(['start', html_path])
+    os.startfile(html_path)
