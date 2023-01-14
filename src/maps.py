@@ -12,8 +12,6 @@ driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install())
 driver.get("https://www.selenium.dev/selenium/web/web-form.html")
 
 
-
-
 #Map shit ——————————————————————————————
 source_path = Path(__file__).resolve().parent
 path = source_path/'location.csv'
