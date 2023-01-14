@@ -9,16 +9,6 @@ import pandas as pd
 import folium
 import os
 
-url = 'https://www.kijiji.ca/b-apartments-condos/hamilton/c37l80014'
-page = requests.get(url)
-soup = BeautifulSoup(page.content, 'html.parser')
-
-rentals = soup.find_all(class_='info-container')
-for rental in rentals:
-    title = rental.find(class_='title').get_text().strip()
-    price = rental.find(class_='price').get_text().strip()
-    print(title + ' | ' + price)
-
 source_path = Path(__file__).resolve().parent
 path = source_path/'location.csv'
 houses = pd.read_csv(path)
