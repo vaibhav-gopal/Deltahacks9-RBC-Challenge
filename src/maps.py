@@ -2,13 +2,19 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
-driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
-
 from pathlib import Path
 import pandas as pd
 import folium
 import os
 
+#Web Scraping shit —————————————————————————
+driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+driver.get("https://www.selenium.dev/selenium/web/web-form.html")
+
+
+
+
+#Map shit ——————————————————————————————
 source_path = Path(__file__).resolve().parent
 path = source_path/'location.csv'
 houses = pd.read_csv(path)
