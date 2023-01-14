@@ -14,8 +14,8 @@ soup = BeautifulSoup(page.content, 'html.parser')
 
 rentals = soup.find_all(class_='info-container')
 for rental in rentals:
-    title = rental.find(class_='title').get_text()
-    price = rental.find(class_='price').get_text()
+    title = rental.find(class_='title').get_text().strip()
+    price = rental.find(class_='price').get_text().strip()
     print(title + ' | ' + price)
 
 # gis = GIS('home')
