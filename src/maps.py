@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 import pandas as pd
 import folium
-import os
+import os, subprocess
 
 url = 'https://www.kijiji.ca/b-apartments-condos/hamilton/c37l80014'
 page = requests.get(url)
@@ -29,4 +29,9 @@ if __name__ == '__main__':
     # save map to html file
     map_kenya.save('index.html')
     html_path = source_path.parent/'index.html'
-    os.startfile(html_path)
+    try:
+        # Using Windows
+        os.startfile(html_path)
+    except:
+        # Using Mac or Linux
+        subprocess.call(['start', html_path])
