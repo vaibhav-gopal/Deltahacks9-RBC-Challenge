@@ -8,6 +8,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.action_chains import ActionChains
 
+from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 import geocoder
 import time
@@ -17,7 +18,7 @@ chrome_options = Options()
 chrome_options.add_argument("--headless")
 usrLoc = geocoder.ip('me').latlng
 try:
-    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)
     driver.implicitly_wait(10)
 except:
     print("Chrome driver is already in use")
@@ -80,12 +81,12 @@ def searchGoogle():
     listings = waitFetchMultiple(google.articlePath)
     google.names = extractAttributes(listings, "aria-label")
     for listing in listings:
-        actions.move_to_element(listing).perform()
+        #actions.move_to_element(listing).perform()
         gotoAndWait(listing, google.locationPath)
-        google.locations.append(waitFetchAttribute(google.locationPath, "aria-label"))
+        # google.locations.append(waitFetchAttribute(google.locationPath, "aria-label"))
         waitUntilClick(google.closeListingPath)
         waitUntil(google.articlePath)
-    print(google.locations)
+    print(google.locations, google.names)
     driver.quit()
 
 searchGoogle()
