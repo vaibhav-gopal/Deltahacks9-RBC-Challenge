@@ -6,25 +6,39 @@ from pathlib import Path
 import pandas as pd
 import folium
 import os, subprocess
+from geopy.geocoders import Nominatim 
 
-#Web Scraping shit —————————————————————————
-driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
-driver.get("https://www.selenium.dev/selenium/web/web-form.html")
+import search
+    
+g_code = Nominatim(user_agent='http')
+search.searchGoogle()
+places = search.google.locations
+places_name = search.google.names
+center = search.usrLoc
+map_ = folium.Map(location=center, zoom_start=8)
 
-
-#Map shit ——————————————————————————————
-source_path = Path(__file__).resolve().parent
-path = source_path/'location.csv'
-houses = pd.read_csv(path)
-
-center = [-0.023559, 37.9061928]
-map_kenya = folium.Map(location=center, zoom_start=8)
-for index, house in houses.iterrows():
-    location = [house['latitude'], house['longitude']]
-    folium.Marker(location, popup = f'Name:{house["store"]}\n Revenue($):{house["revenue"]}').add_to(map_kenya)
+for place in places:
+    spliced_p = place[9:].split(',')
+    try:
+        loc_details = dict(
+            postalcode=spliced_p[-1][-8:],
+            city=spliced_p[-2]
+        )
+        geolocation = g_code.geocode(loc_details)
+        location = (geolocation.latitude, geolocation.longitude)
+        folium.Marker(location).add_to(map_)
+    except:
+        # In the event that it fails
+        continue
 
 if __name__ == '__main__':
     # save map to html file
-    map_kenya.save('index.html')
+    map_.save('index.html')
+    source_path = Path(__file__).resolve().parent
     html_path = source_path.parent/'index.html'
-    os.startfile(html_path)
+    try:
+        # For windows
+        os.startfile(html_path)
+    except:
+        # For linux/mac
+        subprocess.call(['start', html_path])
