@@ -6,34 +6,32 @@ from pathlib import Path
 import pandas as pd
 import folium
 import os, subprocess
-from geopy.geocoders import Nominatim 
+from geopy.geocoders import Nominatim
 
-import search
-    
 g_code = Nominatim(user_agent='http')
-search.searchGoogle()
-places = search.google.locations
-places_name = search.google.names
-center = search.usrLoc
-map_ = folium.Map(location=center, zoom_start=8)
 
-for place in places:
-    spliced_p = place[9:].split(',')
-    try:
-        loc_details = dict(
-            postalcode=spliced_p[-1][-8:],
-            city=spliced_p[-2]
-        )
-        geolocation = g_code.geocode(loc_details)
-        location = (geolocation.latitude, geolocation.longitude)
-        folium.Marker(location).add_to(map_)
-    except:
-        # In the event that it fails
-        continue
+def generate_map(places, names, init):
+    center = init
+    g_code = Nominatim(user_agent='http')
+    map_ = folium.Map(location=center, zoom_start=8)
 
-if __name__ == '__main__':
-    # save map to html file
+    for name, place in zip(names, places):
+        spliced_p = place[9:].split(',')
+        try:
+            loc_details = dict(
+                postalcode=spliced_p[-1][-8:],
+                city=spliced_p[-2]
+            )
+            geolocation = g_code.geocode(loc_details)
+            location = (geolocation.latitude, geolocation.longitude)
+            folium.Marker(location, popup=name).add_to(map_)
+        except:
+            # In the event that it fails
+            continue
     map_.save('index.html')
+
+
+def show_map():
     source_path = Path(__file__).resolve().parent
     html_path = source_path.parent/'index.html'
     try:
@@ -42,3 +40,4 @@ if __name__ == '__main__':
     except:
         # For linux/mac
         subprocess.call(['start', html_path])
+    

@@ -12,7 +12,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 import geocoder
 import time
 
-#Web Scraping shit —————————————————————————
 chrome_options = Options()
 chrome_options.headless = True
 usrLoc = geocoder.ip('me').latlng
