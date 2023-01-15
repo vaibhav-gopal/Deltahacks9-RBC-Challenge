@@ -15,7 +15,7 @@ def generate_map(places, names, init):
     g_code = Nominatim(user_agent='http')
     map_ = folium.Map(location=center, zoom_start=8)
 
-    for name, place in zip(names, places):
+    for name, place in zip(name, places):
         spliced_p = place[9:].split(',')
         try:
             loc_details = dict(
@@ -24,7 +24,7 @@ def generate_map(places, names, init):
             )
             geolocation = g_code.geocode(loc_details)
             location = (geolocation.latitude, geolocation.longitude)
-            folium.Marker(location, popup=name).add_to(map_)
+            folium.Marker(location, popup=name ).add_to(map_)
         except:
             # In the event that it fails
             continue
