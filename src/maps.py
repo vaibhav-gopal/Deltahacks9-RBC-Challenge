@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.action_chains import ActionChains
 
 from webdriver_manager.chrome import ChromeDriverManager
 import geocoder
@@ -17,8 +18,10 @@ chrome_options.add_argument("--headless")
 usrLoc = geocoder.ip('me').latlng
 try:
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+    driver.implicitly_wait(10)
 except:
     print("Chrome driver is already in use")
+actions = ActionChains(driver)
 
 class googleMaps:
     url = "https://www.google.com/maps/search/"
@@ -27,64 +30,59 @@ class googleMaps:
     locationPath = "//button[@data-item-id='address']"
     closeListingPath = "//button[@aria-label='Close']"
     locations = []
+    names = []
 
 google = googleMaps()
-tempEl= []
+
+def waitUntil(path):
+    wait = WebDriverWait(driver, 10)
+    try:
+        wait.until(EC.presence_of_element_located((By.XPATH, path)))
+        wait.until(EC.visibility_of_element_located((By.XPATH, path)))
+    except TimeoutException:
+        print("Timeout Exception: Element not found")
+        driver.quit()
 
 def gotoAndWait(elementOrUrl, path):
     if (isinstance(elementOrUrl, WebElement)):
         elementOrUrl.click()
     else:
         driver.get(elementOrUrl)
-    time.sleep(0.5)
-    wait = WebDriverWait(driver, 10)
-    try:
-        element = wait.until(EC.presence_of_element_located((By.XPATH, path)))
-        if element.is_displayed():
-            print('Element is present')
-        else:
-            print('Element is present but not visible')
-    except TimeoutException:
-        print("Timeout Exception: Element not found")
+    waitUntil(path)
 
 def waitUntilClick(path):
-    time.sleep(0.5)
-    wait = WebDriverWait(driver, 10)
-    try:
-        element = wait.until(EC.presence_of_element_located((By.XPATH, path)))
-        if element.is_displayed():
-            driver.find_element(By.XPATH, path).click()
-            print('Element is present')
-        else:
-            print('Element is present but not visible')
-    except TimeoutException:
-        print("Timeout Exception: Element not found")
+    waitUntil(path)
+    driver.find_element(By.XPATH, path).click()
 
-def waitUntil(path):
-    time.sleep(0.5)
-    wait = WebDriverWait(driver, 10)
-    try:
-        element = wait.until(EC.presence_of_element_located((By.XPATH, path)))
-        if element.is_displayed():
-            print('Element is present')
-        else:
-            print('Element is present but not visible')
-    except TimeoutException:
-        print("Timeout Exception: Element not found")
+def waitFetchAttribute(path, attribute):
+    waitUntil(path)
+    return driver.find_element(By.XPATH, path).get_attribute(attribute)
+
+def waitFetchMultiple(path):
+    waitUntil(path)
+    return driver.find_elements(By.XPATH, path)
+
+def extractAttributes(lst, attribute):
+    result = []
+    for x in lst:
+        result.append(x.get_attribute(attribute))
+    return result
 
 def searchParametersGoogle():
     search = input("What keyword:")
     search.strip().replace(" ", "+").lower()
-    print(usrLoc)
+    print("User IP:",usrLoc)
     return search + "/@" + str(usrLoc[0]) + "," + str(usrLoc[1]) + ',' + str(google.zoomLevel) + "z"
 
 def searchGoogle():
     gotoAndWait(google.url + searchParametersGoogle(), google.articlePath)
-    listings = driver.find_elements(By.XPATH, google.articlePath)
+    time.sleep(2)
+    listings = waitFetchMultiple(google.articlePath)
+    google.names = extractAttributes(listings, "aria-label")
     for listing in listings:
-        print(listing)
+        actions.move_to_element(listing).perform()
         gotoAndWait(listing, google.locationPath)
-        google.locations.append(driver.find_element(By.XPATH, google.locationPath).get_attribute("aria-label"))
+        google.locations.append(waitFetchAttribute(google.locationPath, "aria-label"))
         waitUntilClick(google.closeListingPath)
         waitUntil(google.articlePath)
     print(google.locations)
