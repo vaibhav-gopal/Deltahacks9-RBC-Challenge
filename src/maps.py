@@ -39,5 +39,5 @@ def show_map():
         os.startfile(html_path)
     except:
         # For linux/mac
-        subprocess.call(['start', html_path])
+        subprocess.call(['open', html_path])
     
