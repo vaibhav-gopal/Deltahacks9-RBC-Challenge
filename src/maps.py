@@ -22,6 +22,7 @@ try:
 except:
     print("Chrome driver is already in use")
 actions = ActionChains(driver)
+driver.set_window_size(1200, 720)
 
 class googleMaps:
     url = "https://www.google.com/maps/search/"
@@ -76,7 +77,6 @@ def searchParametersGoogle():
 
 def searchGoogle():
     gotoAndWait(google.url + searchParametersGoogle(), google.articlePath)
-    driver.set_window_size(1200, 720)
     listings = waitFetchMultiple(google.articlePath)
     google.names = extractAttributes(listings, "aria-label")
     print("Got all names and elements!!")
