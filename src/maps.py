@@ -1,7 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
@@ -15,7 +14,7 @@ import time
 
 #Web Scraping shit —————————————————————————
 chrome_options = Options()
-chrome_options.add_argument("--headless")
+chrome_options.headless = True
 usrLoc = geocoder.ip('me').latlng
 try:
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)
@@ -38,8 +37,8 @@ google = googleMaps()
 def waitUntil(path):
     wait = WebDriverWait(driver, 10)
     try:
-        wait.until(EC.presence_of_element_located((By.XPATH, path)))
-        wait.until(EC.visibility_of_element_located((By.XPATH, path)))
+        element = wait.until(EC.presence_of_element_located((By.XPATH, path)))
+        element = wait.until(EC.visibility_of_element_located((By.XPATH, path)))
     except TimeoutException:
         print("Timeout Exception: Element not found")
         driver.quit()
@@ -77,13 +76,15 @@ def searchParametersGoogle():
 
 def searchGoogle():
     gotoAndWait(google.url + searchParametersGoogle(), google.articlePath)
-    time.sleep(2)
+    driver.set_window_size(1200, 720)
     listings = waitFetchMultiple(google.articlePath)
     google.names = extractAttributes(listings, "aria-label")
+    print("Got all names and elements!!")
     for listing in listings:
-        #actions.move_to_element(listing).perform()
+        print("Fetching...")
+        actions.move_to_element(listing).perform()
         gotoAndWait(listing, google.locationPath)
-        # google.locations.append(waitFetchAttribute(google.locationPath, "aria-label"))
+        google.locations.append(waitFetchAttribute(google.locationPath, "aria-label"))
         waitUntilClick(google.closeListingPath)
         waitUntil(google.articlePath)
     print(google.locations, google.names)
