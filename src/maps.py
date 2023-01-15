@@ -15,7 +15,7 @@ def generate_map(places, names, init):
     g_code = Nominatim(user_agent='http')
     map_ = folium.Map(location=center, zoom_start=8)
 
-    for name, place in zip(name, places):
+    for name, place in zip(names, places):
         spliced_p = place[9:].split(',')
         try:
             loc_details = dict(
