@@ -80,7 +80,7 @@ def searchGoogle():
     google.names = extractAttributes(listings, "aria-label")
     print("Got all names and elements!!")
     for listing in listings:
-        print("Fetching...")
+        print("Fetching...", listing)
         actions.move_to_element(listing).perform()
         gotoAndWait(listing, google.locationPath)
         google.locations.append(waitFetchAttribute(google.locationPath, "aria-label"))
