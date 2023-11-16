@@ -1,4 +1,4 @@
-# Deltahacks9Project
+# Rental Listings Web App
 
 ## Inspiration
 My parents owned a small business since 2016, got a strong idea of the startup process and the difficulties and obstacles associated with it.
